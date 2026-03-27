@@ -1,0 +1,351 @@
+// ========================================
+// TravelVista Admin — Global Styles
+// ========================================
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--neutral-700);
+  background-color: var(--neutral-50);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-primary-light);
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// ========================================
+// Element Plus Overrides
+// ========================================
+
+// --- Button ---
+.el-button--primary {
+  --el-button-bg-color: var(--color-primary);
+  --el-button-border-color: var(--color-primary);
+  --el-button-hover-bg-color: var(--color-primary-light);
+  --el-button-hover-border-color: var(--color-primary-light);
+  --el-button-active-bg-color: var(--color-primary-dark);
+  --el-button-active-border-color: var(--color-primary-dark);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 107, 79, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.el-button--warning {
+  --el-button-bg-color: var(--color-accent);
+  --el-button-border-color: var(--color-accent);
+  --el-button-hover-bg-color: var(--color-accent-light);
+  --el-button-hover-border-color: var(--color-accent-light);
+}
+
+.el-button--success {
+  --el-button-bg-color: var(--color-success);
+  --el-button-border-color: var(--color-success);
+}
+
+.el-button--danger {
+  --el-button-bg-color: var(--color-error);
+  --el-button-border-color: var(--color-error);
+}
+
+.el-button--info {
+  --el-button-bg-color: var(--color-secondary);
+  --el-button-border-color: var(--color-secondary);
+}
+
+.el-button {
+  border-radius: var(--border-radius-sm) !important;
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+// Link 类型按钮：无 border、shadow
+.el-button.is-link {
+  border: none !important;
+  box-shadow: none !important;
+
+  &:hover {
+    transform: none;
+    box-shadow: none !important;
+  }
+
+  &:active {
+    transform: none;
+  }
+}
+
+// --- Table ---
+.el-table {
+  --el-table-border-color: var(--border-color);
+  --el-table-header-bg-color: var(--neutral-100);
+  --el-table-row-hover-bg-color: var(--neutral-50);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+
+  th.el-table__cell {
+    font-weight: 600;
+    color: var(--neutral-800);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td.el-table__cell {
+    color: var(--neutral-700);
+    font-size: 14px;
+  }
+}
+
+// --- Pagination ---
+.el-pagination {
+  --el-pagination-bg-color: transparent;
+  --el-pagination-hover-color: var(--color-primary);
+  margin-top: 20px;
+  justify-content: flex-end;
+
+  .el-pager li.is-active {
+    background-color: var(--color-primary);
+    color: #fff;
+    border-radius: var(--border-radius-sm);
+  }
+}
+
+// --- Dialog 遮罩铺满视口 ---
+.el-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+}
+
+.el-dialog__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+// --- Dialog ---
+.el-dialog {
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: var(--shadow-xl);
+
+  .el-dialog__header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px 24px;
+    margin-right: 0;
+  }
+
+  .el-dialog__title {
+    font-weight: 600;
+    color: var(--neutral-800);
+    font-size: 16px;
+  }
+
+  .el-dialog__body {
+    padding: 24px;
+  }
+
+  .el-dialog__footer {
+    border-top: 1px solid var(--border-color);
+    padding: 16px 24px;
+  }
+}
+
+// --- Form ---
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: var(--border-radius-sm) !important;
+  transition: all var(--transition-fast);
+
+  &:focus-within {
+    box-shadow: 0 0 0 2px rgba(26, 107, 79, 0.15) !important;
+  }
+}
+
+.el-form-item__label {
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+// --- Tag ---
+.el-tag {
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+// --- Card ---
+.el-card {
+  --el-card-border-color: var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// --- Message Box ---
+.el-message-box {
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: var(--shadow-xl);
+}
+
+// --- Breadcrumb ---
+.el-breadcrumb {
+  font-size: 14px;
+
+  .el-breadcrumb__inner {
+    color: var(--neutral-500);
+  }
+
+  .el-breadcrumb__item:last-child .el-breadcrumb__inner {
+    color: var(--neutral-800);
+    font-weight: 500;
+  }
+}
+
+// ========================================
+// Utility Classes
+// ========================================
+.page-container {
+  padding: 24px;
+  animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  .page-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--neutral-900);
+    letter-spacing: -0.3px;
+  }
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.table-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+// ========================================
+// Animations
+// ========================================
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Page transition
+.fade-slide-enter-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 3px;
+
+  &:hover {
+    background: var(--neutral-400);
+  }
+}

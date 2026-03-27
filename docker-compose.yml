@@ -1,0 +1,85 @@
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    hostname: mysql
+    restart: unless-stopped
+    networks:
+      app:
+        aliases:
+          - mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: travel_vista
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+      LANG: C.UTF-8
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端 Spring Boot 服务（必须与 mysql 同网络，用 mysql:3306 连接）
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    networks:
+      - app
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      # 使用服务名 mysql 连接（仅 Docker 内有效）
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/travel_vista?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      UPLOAD_PATH: /app/uploads/
+      LANG: C.UTF-8
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # 管理端前端
+  frontend-admin:
+    build:
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - app
+    ports:
+      - "${ADMIN_PORT:-8081}:80"
+    depends_on:
+      - backend
+
+  # 用户端前端
+  frontend-user:
+    build:
+      context: ./frontend-user
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - app
+    ports:
+      - "${USER_PORT:-8082}:80"
+    depends_on:
+      - backend
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  mysql_data:

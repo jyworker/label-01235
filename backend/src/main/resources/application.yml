@@ -1,0 +1,68 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  tomcat:
+    # 避免大文件上传时 Tomcat 提前拒绝导致 413
+    max-http-form-post-size: 210MB
+    max-swallow-size: -1
+
+spring:
+  application:
+    name: travel-vista
+  datasource:
+    url: jdbc:mysql://localhost:3306/travel_vista?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 210MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.tourism.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+sa-token:
+  token-name: satoken
+  timeout: 86400
+  active-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+  jwt-secret-key: TravelVista2026SecretKeyForJWT
+
+# 文件上传路径
+upload:
+  # 支持通过环境变量指定上传目录（Docker 建议 /app/uploads/）
+  path: ${UPLOAD_PATH:./uploads/}
+  url-prefix: /uploads/
+
+# Knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+logging:
+  level:
+    com.tourism: debug
+    com.baomidou.mybatisplus: debug
