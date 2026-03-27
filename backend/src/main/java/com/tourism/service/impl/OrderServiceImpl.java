@@ -103,12 +103,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
         if (order.getStatus() != 0) {
             throw new BusinessException("订单状态不正确，无法支付");
         }
+        if (order.getTotalAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("订单金额异常");
+        }
 
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(1); // 已支付
         update.setPayTime(LocalDateTime.now());
-        this.updateById(update);
+        
+        LambdaQueryWrapper<TicketOrder> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TicketOrder::getId, orderId);
+        wrapper.eq(TicketOrder::getStatus, 0);
+        
+        boolean updated = this.update(update, wrapper);
+        if (!updated) {
+            throw new BusinessException("订单状态已变更，支付失败");
+        }
 
         log.info("订单支付成功: orderNo={}, orderId={}", order.getOrderNo(), orderId);
     }
