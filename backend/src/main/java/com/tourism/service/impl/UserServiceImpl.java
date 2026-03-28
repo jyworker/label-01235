@@ -111,13 +111,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void updateUserInfo(UserUpdateDTO dto) {
         Long userId = StpUserUtil.getLoginIdAsLong();
+        User existing = this.getById(userId);
+        if (existing == null) {
+            throw new BusinessException("用户不存在");
+        }
         User user = new User();
         user.setId(userId);
         user.setNickname(dto.getNickname());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
         user.setGender(dto.getGender());
-        this.updateById(user);
+        user.setVersion(existing.getVersion());
+        boolean success = this.updateById(user);
+        if (!success) {
+            throw new BusinessException("用户信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("用户更新信息: userId={}", userId);
     }
@@ -139,7 +147,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User updateUser = new User();
         updateUser.setId(userId);
         updateUser.setPassword(BCrypt.hashpw(dto.getNewPassword()));
-        this.updateById(updateUser);
+        updateUser.setVersion(user.getVersion());
+        boolean success = this.updateById(updateUser);
+        if (!success) {
+            throw new BusinessException("用户信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("用户修改密码: userId={}", userId);
     }
@@ -147,12 +159,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public String uploadAvatar(MultipartFile file) {
         Long userId = StpUserUtil.getLoginIdAsLong();
+        User existing = this.getById(userId);
+        if (existing == null) {
+            throw new BusinessException("用户不存在");
+        }
         String avatarUrl = fileService.upload(file);
 
         User updateUser = new User();
         updateUser.setId(userId);
         updateUser.setAvatar(avatarUrl);
-        this.updateById(updateUser);
+        updateUser.setVersion(existing.getVersion());
+        boolean success = this.updateById(updateUser);
+        if (!success) {
+            throw new BusinessException("用户信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("用户上传头像: userId={}, avatarUrl={}", userId, avatarUrl);
         return avatarUrl;
@@ -189,7 +209,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User updateUser = new User();
         updateUser.setId(userId);
         updateUser.setStatus(status);
-        this.updateById(updateUser);
+        updateUser.setVersion(user.getVersion());
+        boolean success = this.updateById(updateUser);
+        if (!success) {
+            throw new BusinessException("用户信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("管理员更新用户状态: userId={}, status={}", userId, status);
     }

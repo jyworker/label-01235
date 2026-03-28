@@ -76,7 +76,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         category.setName(dto.getName());
         category.setIcon(dto.getIcon());
         category.setSortOrder(dto.getSortOrder());
-        this.updateById(category);
+        category.setVersion(existing.getVersion());
+        boolean success = this.updateById(category);
+        if (!success) {
+            throw new BusinessException("分类信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("编辑分类: id={}, name={}", dto.getId(), dto.getName());
     }

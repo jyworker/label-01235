@@ -108,7 +108,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
         update.setId(orderId);
         update.setStatus(1); // 已支付
         update.setPayTime(LocalDateTime.now());
-        this.updateById(update);
+        update.setVersion(order.getVersion());
+        
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("订单支付成功: orderNo={}, orderId={}", order.getOrderNo(), orderId);
     }
@@ -131,7 +136,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(3); // 已取消
-        this.updateById(update);
+        update.setVersion(order.getVersion());
+        
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("订单取消: orderNo={}, orderId={}", order.getOrderNo(), orderId);
     }
@@ -240,6 +250,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderStatus(Long orderId, Integer status) {
         TicketOrder order = this.getById(orderId);
         if (order == null) {
@@ -249,10 +260,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(status);
+        update.setVersion(order.getVersion());
         if (status == 1) {
             update.setPayTime(LocalDateTime.now());
         }
-        this.updateById(update);
+        
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("管理员更新订单状态: orderId={}, status={}", orderId, status);
     }

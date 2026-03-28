@@ -29,6 +29,7 @@ CREATE TABLE `user` (
     `status` TINYINT DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
@@ -46,6 +47,7 @@ CREATE TABLE `admin` (
     `status` TINYINT DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
@@ -60,6 +62,8 @@ CREATE TABLE `category` (
     `sort_order` INT DEFAULT 0 COMMENT '排序序号',
     `status` TINYINT DEFAULT 1 COMMENT '状态 0-禁用 1-正常',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='景点分类表';
 
@@ -90,6 +94,7 @@ CREATE TABLE `scenic_spot` (
     `is_hot` TINYINT DEFAULT 0 COMMENT '是否热门 0-否 1-是',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`),
     KEY `idx_category_id` (`category_id`),
     KEY `idx_status` (`status`),
@@ -121,6 +126,7 @@ CREATE TABLE `review` (
     `status` TINYINT DEFAULT 0 COMMENT '状态 0-待审核 1-已通过 2-已拒绝',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_scenic_spot_id` (`scenic_spot_id`),
@@ -157,6 +163,7 @@ CREATE TABLE `ticket_order` (
     `pay_time` DATETIME DEFAULT NULL COMMENT '支付时间',
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `version` INT DEFAULT 0 COMMENT '版本号，用于乐观锁',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_order_no` (`order_no`),
     KEY `idx_user_id` (`user_id`),
