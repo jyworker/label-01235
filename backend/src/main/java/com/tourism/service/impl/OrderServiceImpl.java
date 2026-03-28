@@ -104,23 +104,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
             throw new BusinessException("订单状态不正确，无法支付");
         }
 
-        // 使用MyBatis-Plus的更新方法，添加状态检查条件，防止竞态条件
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(1); // 已支付
         update.setPayTime(LocalDateTime.now());
+        update.setVersion(order.getVersion());
         
-        // 创建更新条件
-        LambdaQueryWrapper<TicketOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TicketOrder::getId, orderId)
-               .eq(TicketOrder::getStatus, 0); // 只有状态为0的订单才能更新
-        
-        // 执行更新
-        int affectedRows = this.baseMapper.update(update, wrapper);
-        
-        if (affectedRows == 0) {
-            // 没有更新到任何记录，说明订单状态已经被其他线程修改
-            throw new BusinessException("订单状态已变更，无法支付");
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
         }
 
         log.info("订单支付成功: orderNo={}, orderId={}", order.getOrderNo(), orderId);
@@ -141,22 +133,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
             throw new BusinessException("仅待支付订单可取消");
         }
 
-        // 使用MyBatis-Plus的更新方法，添加状态检查条件，防止竞态条件
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(3); // 已取消
+        update.setVersion(order.getVersion());
         
-        // 创建更新条件
-        LambdaQueryWrapper<TicketOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TicketOrder::getId, orderId)
-               .eq(TicketOrder::getStatus, 0); // 只有状态为0的订单才能更新
-        
-        // 执行更新
-        int affectedRows = this.baseMapper.update(update, wrapper);
-        
-        if (affectedRows == 0) {
-            // 没有更新到任何记录，说明订单状态已经被其他线程修改
-            throw new BusinessException("订单状态已变更，无法取消");
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
         }
 
         log.info("订单取消: orderNo={}, orderId={}", order.getOrderNo(), orderId);
@@ -266,6 +250,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderStatus(Long orderId, Integer status) {
         TicketOrder order = this.getById(orderId);
         if (order == null) {
@@ -275,10 +260,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, TicketOrder> impl
         TicketOrder update = new TicketOrder();
         update.setId(orderId);
         update.setStatus(status);
+        update.setVersion(order.getVersion());
         if (status == 1) {
             update.setPayTime(LocalDateTime.now());
         }
-        this.updateById(update);
+        
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("订单信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("管理员更新订单状态: orderId={}, status={}", orderId, status);
     }

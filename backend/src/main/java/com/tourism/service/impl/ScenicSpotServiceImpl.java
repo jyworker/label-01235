@@ -175,7 +175,12 @@ public class ScenicSpotServiceImpl extends ServiceImpl<ScenicSpotMapper, ScenicS
 
         ScenicSpot spot = new ScenicSpot();
         BeanUtils.copyProperties(dto, spot);
-        this.updateById(spot);
+        spot.setVersion(existing.getVersion());
+        
+        boolean success = this.updateById(spot);
+        if (!success) {
+            throw new BusinessException("景点信息已被其他用户修改，请刷新后重试");
+        }
 
         // 更新图片：先删除旧图片，再保存新图片
         if (dto.getImages() != null) {
@@ -204,6 +209,7 @@ public class ScenicSpotServiceImpl extends ServiceImpl<ScenicSpotMapper, ScenicS
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateScenicSpotStatus(Long id, Integer status) {
         ScenicSpot spot = this.getById(id);
         if (spot == null) {
@@ -213,7 +219,12 @@ public class ScenicSpotServiceImpl extends ServiceImpl<ScenicSpotMapper, ScenicS
         ScenicSpot update = new ScenicSpot();
         update.setId(id);
         update.setStatus(status);
-        this.updateById(update);
+        update.setVersion(spot.getVersion());
+        
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("景点信息已被其他用户修改，请刷新后重试");
+        }
 
         log.info("更新景点状态: id={}, status={}", id, status);
     }

@@ -225,7 +225,11 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review> impleme
         Review update = new Review();
         update.setId(id);
         update.setStatus(status);
-        this.updateById(update);
+        update.setVersion(review.getVersion());
+        boolean success = this.updateById(update);
+        if (!success) {
+            throw new BusinessException("评论信息已被其他用户修改，请刷新后重试");
+        }
 
         // 审核通过后更新景点评分
         if (status == 1) {
